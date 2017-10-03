@@ -67,12 +67,15 @@ def unFollow(apis):
 
     return unfollow_list
 
-def search_word_and_follow(apis, keywords**):
+def search_word_and_follow(apis, keywords=None):
     user_ids = []
     # keywords =[u'プログラミング']
     query = ' OR '.join(keywords)
     count = 0
     follow_num = 1000
+
+    if keywords == None:
+        exit()
 
     for api in apis:
         try:
