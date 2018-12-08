@@ -62,7 +62,8 @@ def unFollow(apis):
                 print('Invalid or expired token!')
                 continue
             else:
-                print("Unknown Error!")
+                # print("Unknown Error!")
+                print(e)
                 continue
 
     return unfollow_list
@@ -70,23 +71,23 @@ def unFollow(apis):
 def search_word_and_follow(apis, keywords=None):
     user_ids = []
     # keywords =[u'プログラミング']
+    if keywords == None:
+        return
     query = ' OR '.join(keywords)
     count = 0
     follow_num = 1000
-
-    if keywords == None:
-        exit()
 
     for api in apis:
         try:
             for tweet in tweepy.Cursor(api.search, q=query, count=follow_num).items():
                 print(tweet.user.id)
-                api.create_friendship(tweet.user.id)
+                friend = api.create_friendship(tweet.user.id)
+                if friend:
+                    sleep(randint(1, 3))
                 count+=1
-                sleep(randint(1, 3))
                 if count == 100:
                     count=0
-                    sleep(30)
+                    sleep(15)
         except TweepError as e:
             if e.api_code == 162 or e.api_code == 160: # フォローをブロック or すでにフォロー
                 print("already follow!")
@@ -101,12 +102,15 @@ def search_word_and_follow(apis, keywords=None):
                 print('Invalid or expired token!')
                 continue
             else:
-                print("Unknown Error!")
+                # print("Unknown Error!")
+                print(e)
                 continue
 
-def benchmark_follow(apis):
+def benchmark_follow(apis, keywords=None):
     user_ids = []
     benchmark_account_ids =[]
+    if keywords == None:
+        return
     query = ' OR '.join(keywords)
     count = 0
     follow_num = 1000
@@ -141,7 +145,8 @@ def benchmark_follow(apis):
                     print('Invalid or expired token!')
                     continue
                 else:
-                    print("Unknown Error!")
+                    # print("Unknown Error!")
+                    print(e)
                     continue
 
 def followBack(apis):
@@ -166,9 +171,8 @@ def followBack(apis):
                 if not follower_account in follow_list:
                     api.create_friendship(follower_account)
                     print("follow is success!")
+                    time.sleep(1)
                     # follow_back_list[api].extend(follower_account)
-                else:
-                    print()
             except TweepError as e:
                 if e.api_code  == 160 or e.api_code == 162:
                     print("already requests to follow!")
@@ -186,8 +190,7 @@ def followBack(apis):
                     print("Unknown Error!")
                     print(e.api_code)
                     continue
-            time.sleep(1)
-        print("follow back {} users!".format(str(len(follow_back_list[api]))))
+        # print("follow back {} users!".format(str(len(follow_back_list[api]))))
         print("follow back is done!")
 
     return follow_back_list
@@ -204,7 +207,9 @@ if __name__ == "__main__":
     api = getApiInstance(consumer_keys=consumer_keys, consumer_secrets=consumer_secrets, access_token_keys=access_token_keys, access_token_secrets=access_token_secrets)
     print("get Api is done!")
     # unfollow_list = unFollow(apis = api)
-    follow_back_list = followBack(apis = api)
-    search = search_word_and_follow(apis = api)
+    # follow_back_list = followBack(apis = api)
+    keywords = ['プログラミング', '初心者']
+    search = search_word_and_follow(apis = api, keywords=keywords)
 
-    print("done!") #数で確認してみる
+    if search:
+        print("done!") #数で確認してみる
